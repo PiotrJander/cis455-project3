@@ -55,7 +55,7 @@
 
   <target name="compile-master" depends="init">
     <javac srcdir="src" destdir="target/master/WEB-INF/classes" includes="**/master/*.java" deprecation="on"
-           debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
+           debug="true" includeantruntime="false" classpath="lib/servlet-api-3.1.jar">
       <compilerarg value="-Xlint"/>
     </javac>
   </target>

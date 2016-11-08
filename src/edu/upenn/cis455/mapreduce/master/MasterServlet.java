@@ -40,8 +40,10 @@ public class MasterServlet extends HttpServlet {
         switch (request.getPathInfo()) {
             case "/status":
                 status();
+                break;
             case "/workerstatus":
                 workerStatus();
+                break;
             default:
                 response.sendError(404);
         }
@@ -56,7 +58,7 @@ public class MasterServlet extends HttpServlet {
 
         workers.forEach((k, worker) -> {
             Instant lastActive = (Instant) worker.get(WorkerFields.LAST_ACTIVE);
-            if (lastActive.isBefore(Instant.now().minusSeconds(ACTIVE_DURATION))) {
+            if (lastActive.isAfter(Instant.now().minusSeconds(ACTIVE_DURATION))) {
                 writer.format(
                         "<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>\n",
                         worker.get(WorkerFields.ID),
@@ -83,7 +85,7 @@ public class MasterServlet extends HttpServlet {
 
         boolean success = normalize(workerStatus);
         if (success) {
-            String workerId = (String) workerStatus.get(WorkerFields.IP + ":" + WorkerFields.PORT);
+            String workerId = workerStatus.get(WorkerFields.IP) + ":" + workerStatus.get(WorkerFields.PORT);
             workerStatus.put(WorkerFields.ID, workerId);
             workers.put(workerId, workerStatus);
         }
