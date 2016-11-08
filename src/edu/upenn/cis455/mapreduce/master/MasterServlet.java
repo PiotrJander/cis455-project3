@@ -13,8 +13,8 @@ public class MasterServlet extends HttpServlet {
   {
     response.setContentType("text/html");
     PrintWriter out = response.getWriter();
-    out.println("<html><head><title>Master</title></head>");
-    out.println("<body>Hi, I am the master!</body></html>");
+    out.println("<html><head><title>Status</title></head>");
+    out.println("<body>Status goes here</body></html>");
   }
 }
   

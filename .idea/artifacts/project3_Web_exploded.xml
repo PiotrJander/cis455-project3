@@ -1,0 +1,34 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="project3:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/project3_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="project3/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="project3" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$PROJECT_DIR$/lib/je-6.2.31.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jtidy-r938.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/junit-4.12.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/servlet-api.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/log4j-1.2.17.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/servlet-api-3.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/slf4j-api-1.7.21.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/spark-core-1.1.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/commons-lang3-3.4.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/slf4j-log4j12-1.7.21.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.annotation-api-1.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jetty-jmx-9.3.12.v20160915.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jetty-runner-9.3.9.v20160517.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jetty-server-9.3.12.v20160915.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jetty-webapp-9.3.12.v20160915.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jetty-security-9.3.12.v20160915.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jackson-core-2.9.0-20160930.222323-13.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jackson-databind-2.9.0-20161012.002007-91.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jackson-annotations-2.9.0-20161011.053116-27.jar" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
