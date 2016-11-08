@@ -8,18 +8,9 @@
          <servlet-class>edu.upenn.cis455.mapreduce.master.MasterServlet</servlet-class>
      </servlet>
 
-     <!--<servlet>-->
-         <!--<servlet-name>WorkerStatusServlet</servlet-name>-->
-         <!--<servlet-class>edu.upenn.cis455.mapreduce.master.WorkerStatusServlet</servlet-class>-->
-     <!--</servlet>-->
-
      <servlet-mapping>
          <servlet-name>MasterServlet</servlet-name>
          <url-pattern>/*</url-pattern>
      </servlet-mapping>
 
-     <!--<servlet-mapping>-->
-         <!--<servlet-name>WorkerStatusServlet</servlet-name>-->
-         <!--<url-pattern>/workerstatus</url-pattern>-->
-     <!--</servlet-mapping>-->
 </web-app>
