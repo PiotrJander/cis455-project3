@@ -1,6 +1,18 @@
 package edu.upenn.cis455.mapreduce.worker;
 
-import static spark.Spark.setPort;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.upenn.cis.stormlite.Config;
+import edu.upenn.cis.stormlite.DistributedCluster;
+import edu.upenn.cis.stormlite.TopologyContext;
+import edu.upenn.cis.stormlite.distributed.WorkerHelper;
+import edu.upenn.cis.stormlite.distributed.WorkerJob;
+import edu.upenn.cis.stormlite.routers.StreamRouter;
+import edu.upenn.cis.stormlite.tuple.Tuple;
+import org.apache.log4j.Logger;
+import spark.Request;
+import spark.Response;
+import spark.Route;
+import spark.Spark;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,20 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.upenn.cis.stormlite.DistributedCluster;
-import edu.upenn.cis.stormlite.TopologyContext;
-import edu.upenn.cis.stormlite.distributed.WorkerHelper;
-import edu.upenn.cis.stormlite.distributed.WorkerJob;
-import edu.upenn.cis.stormlite.routers.StreamRouter;
-import edu.upenn.cis.stormlite.tuple.Tuple;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.Spark;
+import static spark.Spark.setPort;
 
 /**
  * Simple listener for worker creation 
@@ -34,19 +33,16 @@ public class WorkerServer {
 	static Logger log = Logger.getLogger(WorkerServer.class);
 	
     static DistributedCluster cluster = new DistributedCluster();
-    
+    static List<String> topologies = new ArrayList<>();
     List<TopologyContext> contexts = new ArrayList<>();
-
 	int myPort;
-	
-	static List<String> topologies = new ArrayList<>();
 	
 	public WorkerServer(int myPort) throws MalformedURLException {
 		
 		log.info("Creating server listener at socket " + myPort);
-	
-		setPort(myPort);
-    	final ObjectMapper om = new ObjectMapper();
+
+        setPort(myPort);  // TODO what kind of method is it
+        final ObjectMapper om = new ObjectMapper();
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         Spark.post(new Route("/definejob") {
 
@@ -164,5 +160,28 @@ public class WorkerServer {
 		}
 		
     	cluster.shutdown();
-	}
+    }
+
+    /**
+     * Start the second node; the one running on a different Java virtual machine than the master.
+     */
+    public static void main(String[] args) {
+
+        Config config = new Config();
+        config.put("workerList", "[127.0.0.1:8000,127.0.0.1:8001]");
+
+        // start the first (0-th) node along master by default
+        config.put("workerIndex", "1");
+
+        WorkerServer.createWorker(config);
+
+        // master originally started here
+
+        // TODO when and how do we exit? destroy on servlet
+
+//        System.out.println("Press [Enter] to exit...");
+//        (new BufferedReader(new InputStreamReader(System.in))).readLine();
+//        WorkerServer.shutdown();
+//        System.exit(0);
+    }
 }
