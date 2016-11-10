@@ -34,8 +34,6 @@ public class EmbeddedJetty
 
         // master originally started here
 
-        // TODO when and how do we exit? destroy on servlet
-
 //        System.out.println("Press [Enter] to exit...");
 //        (new BufferedReader(new InputStreamReader(System.in))).readLine();
 //        WorkerServer.shutdown();
