@@ -8,7 +8,7 @@ import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.distributed.WorkerJob;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Tuple;
-import edu.upenn.cis455.utils.FormUrlEncoded;
+import edu.upenn.cis455.utils.HttpClient;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import spark.Request;
@@ -17,6 +17,7 @@ import spark.Route;
 import spark.Spark;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -194,17 +195,34 @@ public class WorkerServer {
     private void reportStatus() {
         Thread t = new Thread(() -> {
             while (true) {
-                // report status every 15 secs
+                // TODO pass master address
+                try {
+                    HttpURLConnection conn =
+                            HttpClient.get("http://localhost:8080/workerstatus", "GET", state.getStateAsMap());
+                    if (conn.getResponseCode() != 200) {
+                        System.err.println("Report status request error");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    // TODO make 15 secs
+                    Thread.sleep(3 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         t.start();
 
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // TODO join threads gracefully
+//        try {
+//            t.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private enum Status {
@@ -235,10 +253,6 @@ public class WorkerServer {
             ret.put("keysWritten", String.valueOf(keysWritten));
             ret.put("results", results);
             return ret;
-        }
-
-        String getQueryString() {
-            return FormUrlEncoded.fromMap(getStateAsMap());
         }
     }
 }

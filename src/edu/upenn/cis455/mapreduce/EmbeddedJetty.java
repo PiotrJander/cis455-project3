@@ -18,8 +18,8 @@ public class EmbeddedJetty
     public static void main( String[] args ) throws Exception
     {
         BasicConfigurator.configure();
+//        node(args);
         jetty();
-        node(args);
     }
 
     private static void node(String[] args) throws IOException {
