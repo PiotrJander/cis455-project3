@@ -64,7 +64,7 @@ public class MasterLaunch {
             return false;
         }
 
-        if (!Stream.of(MAP_THREADS, REDUCE_THREADS).map(param -> fields.get(param)).allMatch(s -> s.matches("^\\d+$"))) {
+        if (!Stream.of(MAP_THREADS, REDUCE_THREADS).map(fields::get).allMatch(s -> s.matches("^\\d+$"))) {
             response.sendError(400, "`map_threads`, `reduce_threads` parameters must be numbers");
             return false;
         }
@@ -80,6 +80,7 @@ public class MasterLaunch {
         String activeWorkers = workers.getActiveWorkers()
                 .map(worker -> (String) worker.get("id"))
                 .collect(Collectors.joining(","));
+
         config.put("workerList", "[" + activeWorkers + "]");
         config.put("job", String.format("MyJob%03d", jobCounter++));
         config.put("master", request.getLocalAddr() + ":" + request.getLocalPort());

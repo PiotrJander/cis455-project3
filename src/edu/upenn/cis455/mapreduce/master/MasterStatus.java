@@ -86,6 +86,7 @@ public class MasterStatus {
         writer.println("<p>Output directory: <input type=\"text\" name=\"output_dir\"></p>");
         writer.println("<p>Number of map threads: <input type=\"number\" name=\"map_threads\"></p>");
         writer.println("<p>Number of reduce threads: <input type=\"number\" name=\"reduce_threads\"></p>");
+        writer.println("<p><input type=\"submit\" value='Submit'></p>");
         writer.println("</form>");
     }
 
