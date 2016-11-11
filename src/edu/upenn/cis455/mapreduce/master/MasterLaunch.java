@@ -6,6 +6,7 @@ import edu.upenn.cis.stormlite.Topology;
 import edu.upenn.cis.stormlite.TopologyBuilder;
 import edu.upenn.cis.stormlite.bolt.MapBolt;
 import edu.upenn.cis.stormlite.bolt.ReduceBolt;
+import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.distributed.WorkerJob;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import test.edu.upenn.cis.stormlite.PrintBolt;
@@ -14,10 +15,14 @@ import test.edu.upenn.cis.stormlite.mapreduce.WordFileSpout;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MasterLaunch {
 
@@ -47,31 +52,85 @@ public class MasterLaunch {
 
         boolean success = normalizeLaunch(response, fields);
         if (success) {
-            sendDefineJob(request, fields, workers);
-            sendRunJob();
+            Config config = makeConfig(request, fields, workers);
+            Topology topology = getTopology(config);
+            WorkerJob job = new WorkerJob(topology, config);
+            String[] activeWorkers = WorkerHelper.getWorkers(config);
+            sendDefineJob(activeWorkers, job);
+            sendRunJob(activeWorkers, job);
         }
     }
 
-    private static Config makeConfig(
-            HttpServletRequest request,
-            HashMap<String, Object> fields,
-            WorkersMap workers
-    ) {
+    private static void sendDefineJob(String[] activeWorkers, WorkerJob job) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+
+        // TODO possibly add worker index to config
+        IntStream.range(0, activeWorkers.length).forEach(i -> {
+            try {
+                String workerAddress = activeWorkers[i];
+                String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(job);
+                if (sendJob(workerAddress, "POST", "/definejob", json).getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    throw new RuntimeException("Job definition request failed");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        });
+    }
+
+    private static void sendRunJob(String[] activeWorkers, WorkerJob job) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+
+        // TODO possibly add worker index to config
+        IntStream.range(0, activeWorkers.length).forEach(i -> {
+            try {
+                String workerAddress = activeWorkers[i];
+                String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(job);
+                if (sendJob(workerAddress, "POST", "/runjob", json).getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    throw new RuntimeException("Job execution request failed");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        });
+    }
+
+    private static HttpURLConnection sendJob(String workerAddress, String method, String path, String parameters) throws IOException {
+        URL url = new URL(new URL(workerAddress), path);
+
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setDoOutput(true);
+        conn.setRequestMethod(method);
+
+        if (method.equals("POST")) {
+            conn.setRequestProperty("Content-Type", "application/json");
+            OutputStream os = conn.getOutputStream();
+            byte[] toSend = parameters.getBytes();
+            os.write(toSend);
+            os.flush();
+        } else {
+            conn.getOutputStream();
+        }
+
+        return conn;
+    }
+
+    private static Config makeConfig(HttpServletRequest request, HashMap<String, Object> fields, WorkersMap workers) {
         Config config = new Config();
 
-        // TODO based on status
-
-
-        config.put("workerList", "[127.0.0.1:8000,127.0.0.1:8001]");
-
-//        if (args.length >= 1) {
-//            config.put("workerIndex", args[0]);
-//        } else
-//            config.put("workerIndex", "0");
+        String activeWorkers = workers.getActiveWorkers()
+                .map(worker -> (String) worker.get("id"))
+                .collect(Collectors.joining(","));
+        config.put("workerList", "[" + activeWorkers + "]");
 
         // TODO resolve job naming
         config.put("job", "MyJob1");
 
+        // TODO ensure this is correct
         config.put("master", request.getLocalAddr() + ":" + request.getLocalPort());
 
         config.put("mapClass", (String) fields.get(CLASS_NAME));
@@ -83,13 +142,7 @@ public class MasterLaunch {
         return config;
     }
 
-    private static void sendDefineJob(
-            HttpServletRequest request,
-            HashMap<String, Object> fields,
-            WorkersMap workers
-    ) throws IOException {
-        Config config = makeConfig(request, fields, workers);
-
+    private static Topology getTopology(Config config) {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(
@@ -116,43 +169,7 @@ public class MasterLaunch {
                 1
         ).firstGrouping(REDUCE_BOLT);
 
-        Topology topo = builder.createTopology();
-        WorkerJob job = new WorkerJob(topo, config);
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-
-        // now this sends to each worker
-//        try {
-//            String[] workers = WorkerHelper.getWorkers(config);
-//
-//            int i = 0;
-//            for (String dest : workers) {
-//                config.put("workerIndex", String.valueOf(i++));
-//                if (sendJob(dest, "POST", config, "definejob",
-//                        mapper.writerWithDefaultPrettyPrinter().writeValueAsString(job)).getResponseCode() !=
-//                        HttpURLConnection.HTTP_OK) {
-//                    throw new RuntimeException("Job definition request failed");
-//                }
-//            }
-//            for (String dest : workers) {
-//                if (sendJob(dest, "POST", config, "runjob", "").getResponseCode() !=
-//                        HttpURLConnection.HTTP_OK) {
-//                    throw new RuntimeException("Job execution request failed");
-//                }
-//            }
-//        } catch (JsonProcessingException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//            System.exit(0);
-//        }
-    }
-
-    private static HttpURLConnection sendJob(String dest, String post, Config config, String runjob, String s) {
-        return null;
-    }
-
-    private static void sendRunJob() {
-
+        return builder.createTopology();
     }
 
     private static boolean normalizeLaunch(HttpServletResponse response, HashMap<String, Object> fields) throws IOException {
