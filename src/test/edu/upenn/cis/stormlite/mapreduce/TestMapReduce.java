@@ -1,17 +1,7 @@
 package test.edu.upenn.cis.stormlite.mapreduce;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.upenn.cis.stormlite.Config;
 import edu.upenn.cis.stormlite.Topology;
 import edu.upenn.cis.stormlite.TopologyBuilder;
@@ -22,7 +12,15 @@ import edu.upenn.cis.stormlite.distributed.WorkerJob;
 import edu.upenn.cis.stormlite.spout.FileSpout;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis455.mapreduce.worker.WorkerServer;
+import org.apache.log4j.Logger;
 import test.edu.upenn.cis.stormlite.PrintBolt;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Simple word counter test case, largely derived from
@@ -47,15 +45,14 @@ import test.edu.upenn.cis.stormlite.PrintBolt;
  * limitations under the License.
  */
 public class TestMapReduce {
-	static Logger log = Logger.getLogger(TestMapReduce.class);
-
 	private static final String WORD_SPOUT = "WORD_SPOUT";
     private static final String MAP_BOLT = "MAP_BOLT";
     private static final String REDUCE_BOLT = "REDUCE_BOLT";
     private static final String PRINT_BOLT = "PRINT_BOLT";
-    
-    static void createSampleMapReduce(Config config) {
-        // Job name
+	static Logger log = Logger.getLogger(TestMapReduce.class);
+
+	static void createSampleMapReduce(Config config) {
+		// Job name
         config.put("job", "MyJob1");
         
         // IP:port for /workerstatus to be sent
@@ -152,7 +149,7 @@ public class TestMapReduce {
 					}
 				}
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 		        System.exit(0);
 			}        

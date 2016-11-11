@@ -17,21 +17,7 @@
  */
 package edu.upenn.cis.stormlite;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.upenn.cis.stormlite.bolt.BoltDeclarer;
 import edu.upenn.cis.stormlite.bolt.IRichBolt;
 import edu.upenn.cis.stormlite.bolt.OutputCollector;
@@ -41,6 +27,13 @@ import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.spout.IRichSpout;
 import edu.upenn.cis.stormlite.spout.SpoutOutputCollector;
 import edu.upenn.cis.stormlite.tasks.SpoutTask;
+import org.apache.log4j.Logger;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Use multiple threads to simulate a cluster of worker nodes.
@@ -137,10 +130,10 @@ public class DistributedCluster implements Runnable {
 					spoutStreams.get(key).add(newSpout);
 					log.debug("Created a spout executor " + key + "/" + newSpout.getExecutorId() + " of type " + spout.getLeft());
 				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -168,10 +161,10 @@ public class DistributedCluster implements Runnable {
 					boltStreams.get(key).add(newBolt);
 					log.debug("Created a bolt executor " + key + "/" + newBolt.getExecutorId() + " of type " + bolt.getLeft());
 				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
+					// Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -235,8 +228,6 @@ public class DistributedCluster implements Runnable {
 
 	/**
 	 * For each bolt in the topology, clean up objects
-	 * 
-	 * @param topo Topology
 	 */
 	private void closeBoltInstances() {
 		for (List<IRichBolt> boltSet: boltStreams.values())
@@ -246,8 +237,6 @@ public class DistributedCluster implements Runnable {
 
 	/**
 	 * For each spout in the topology, create multiple objects (according to the parallelism)
-	 * 
-	 * @param topo Topology
 	 */
 	private void closeSpoutInstances() {
 		for (List<IRichSpout> spoutSet: spoutStreams.values())

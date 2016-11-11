@@ -1,5 +1,12 @@
 package edu.upenn.cis.stormlite.spout;
 
+import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
+import edu.upenn.cis.stormlite.TopologyContext;
+import edu.upenn.cis.stormlite.routers.StreamRouter;
+import edu.upenn.cis.stormlite.tuple.Fields;
+import edu.upenn.cis.stormlite.tuple.Values;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -7,16 +14,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
-import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
-import edu.upenn.cis.stormlite.TopologyContext;
-import edu.upenn.cis.stormlite.routers.StreamRouter;
-import edu.upenn.cis.stormlite.spout.IRichSpout;
-import edu.upenn.cis.stormlite.spout.SpoutOutputCollector;
-import edu.upenn.cis.stormlite.tuple.Fields;
-import edu.upenn.cis.stormlite.tuple.Values;
 
 /**
  * Simple word spout, largely derived from
@@ -91,7 +88,7 @@ public abstract class FileSpout implements IRichSpout {
         	else
         		reader = new BufferedReader(new FileReader(filename));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -105,7 +102,7 @@ public abstract class FileSpout implements IRichSpout {
 	    	try {
 				reader.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 			}
     }

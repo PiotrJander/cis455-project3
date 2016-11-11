@@ -1,17 +1,16 @@
 package edu.upenn.cis.stormlite.bolt;
 
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
 import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
 import edu.upenn.cis.stormlite.TopologyContext;
-import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
+import edu.upenn.cis455.mapreduce.Context;
 import edu.upenn.cis455.mapreduce.Job;
+import org.apache.log4j.Logger;
+
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A simple adapter that takes a MapReduce "Job" and calls the "map"
@@ -82,9 +81,9 @@ public class MapBolt implements IRichBolt {
         	try {
 				mapJob = (Job)Class.forName(mapperClass).newInstance();
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw new RuntimeException("Unable to instantiate the class " + mapperClass);
+                // Auto-generated catch block
+                e.printStackTrace();
+                throw new RuntimeException("Unable to instantiate the class " + mapperClass);
 			}
         }
         
@@ -110,6 +109,8 @@ public class MapBolt implements IRichBolt {
 	        	throw new RuntimeException("We received data after we thought the stream had ended!");
 	        
 	        // TODO:  call the mapper, and do bookkeeping to track work done
+            mapJob.map(input.getStringByField("key"), input.getStringByField("value"), (Context) context);
+
     	} else if (input.isEndOfStream()) {
     		// TODO: determine what to do with EOS
 

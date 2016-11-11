@@ -1,20 +1,14 @@
 package edu.upenn.cis.stormlite.bolt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
 import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
 import edu.upenn.cis.stormlite.TopologyContext;
-import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
 import edu.upenn.cis455.mapreduce.Job;
+import org.apache.log4j.Logger;
+
+import java.util.*;
 
 /**
  * A simple adapter that takes a MapReduce "Job" and calls the "reduce"
@@ -59,15 +53,12 @@ public class ReduceBolt implements IRichBolt {
 	 * Buffer for state, by key
 	 */
 	Map<String, List<String>> stateByKey = new HashMap<>();
-
+	int neededVotesToComplete = 0;
 	/**
      * This is where we send our output stream
      */
     private OutputCollector collector;
-    
     private TopologyContext context;
-    
-    int neededVotesToComplete = 0;
     
     public ReduceBolt() {
     }
@@ -89,7 +80,7 @@ public class ReduceBolt implements IRichBolt {
         	try {
 				reduceJob = (Job)Class.forName(mapperClass).newInstance();
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 				throw new RuntimeException("Unable to instantiate the class " + mapperClass);
 			}

@@ -69,9 +69,9 @@ public class WorkerServer {
 							topologies.add(workerJob.getConfig().get("job"));
 						}
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+                        // Auto-generated catch block
+                        e.printStackTrace();
+                    }
 		            return "Job launched";
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -122,8 +122,8 @@ public class WorkerServer {
 
                     return "OK";
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+                    // Auto-generated catch block
+                    e.printStackTrace();
 
                     arg1.status(500);
 					return e.getMessage();
@@ -154,9 +154,9 @@ public class WorkerServer {
                 WorkerServer worker = new WorkerServer(url.getPort());
                 worker.reportStatus();
             } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                // Auto-generated catch block
+                e.printStackTrace();
+            }
 		}
 	}
 

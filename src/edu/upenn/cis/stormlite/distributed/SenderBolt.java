@@ -1,17 +1,6 @@
 package edu.upenn.cis.stormlite.distributed;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
 import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.bolt.IRichBolt;
@@ -19,6 +8,14 @@ import edu.upenn.cis.stormlite.bolt.OutputCollector;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * This is a virtual bolt that is used to route data to the WorkerServer
@@ -65,7 +62,7 @@ public class SenderBolt implements IRichBolt {
 		try {
 			url = new URL(address + "/pushdata/" + stream);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException("Unable to create remote URL");
 		}
@@ -80,7 +77,7 @@ public class SenderBolt implements IRichBolt {
     		try {
 				send(input);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// Auto-generated catch block
 				e.printStackTrace();
 			}
     }
@@ -88,7 +85,6 @@ public class SenderBolt implements IRichBolt {
     /**
      * Sends the data along a socket
      * 
-     * @param stream
      * @param tuple
      * @throws IOException 
      */

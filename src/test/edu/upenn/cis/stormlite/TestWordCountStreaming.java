@@ -1,15 +1,13 @@
 package test.edu.upenn.cis.stormlite;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.upenn.cis.stormlite.Config;
 import edu.upenn.cis.stormlite.LocalCluster;
 import edu.upenn.cis.stormlite.Topology;
 import edu.upenn.cis.stormlite.TopologyBuilder;
 import edu.upenn.cis.stormlite.tuple.Fields;
+import org.apache.log4j.Logger;
 
 /**
  * Simple word counter test case, largely derived from
@@ -34,11 +32,10 @@ import edu.upenn.cis.stormlite.tuple.Fields;
  * limitations under the License.
  */
 public class TestWordCountStreaming {
-	static Logger log = Logger.getLogger(TestWordCountStreaming.class);
-
 	private static final String WORD_SPOUT = "WORD_SPOUT";
     private static final String COUNT_BOLT = "COUNT_BOLT";
     private static final String PRINT_BOLT = "PRINT_BOLT";
+    static Logger log = Logger.getLogger(TestWordCountStreaming.class);
     
     public static void main(String[] args) throws Exception {
         Config config = new Config();
@@ -68,9 +65,9 @@ public class TestWordCountStreaming {
 			
 			System.out.println("The StormLite topology is:\n" + str);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // Auto-generated catch block
+            e.printStackTrace();
+        }
         
         
         cluster.submitTopology("test", config, 
