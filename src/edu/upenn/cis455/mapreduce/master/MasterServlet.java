@@ -11,15 +11,18 @@ import static edu.upenn.cis455.mapreduce.master.MasterStatus.getWorkerStatus;
 public class MasterServlet extends HttpServlet {
 
     final static long serialVersionUID = 455555001;
+
+    private WorkersMap workers = new WorkersMap();
+
 //    static Logger log = Logger.getLogger(MasterServlet.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws java.io.IOException {
         switch (request.getPathInfo()) {
             case "/status":
-                MasterStatus.getStatus(request, response);
+                MasterStatus.getStatus(request, response, workers);
                 break;
             case "/workerstatus":
-                getWorkerStatus(request, response);
+                getWorkerStatus(request, response, workers);
                 break;
             default:
                 response.sendError(404);
@@ -30,7 +33,7 @@ public class MasterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         switch (request.getPathInfo()) {
             case "/launch":
-                MasterLaunch.postLaunch(request, response);
+                MasterLaunch.postLaunch(request, response, workers);
                 break;
             default:
                 response.sendError(404);

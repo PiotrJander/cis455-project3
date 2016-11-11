@@ -8,12 +8,10 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class MasterStatus {
 
-    private static final int ACTIVE_DURATION = 30;
     private final static String ID = "id";
     private final static String IP = "ip";
     private final static String LAST_ACTIVE = "lastActive";
@@ -24,9 +22,12 @@ public class MasterStatus {
     private final static String KEYS_WRITTEN = "keysWritten";
     private final static String RESULTS = "results";
     private final static List<String> requestsParams = Arrays.asList(PORT, STATUS, JOB, KEYS_READ, KEYS_WRITTEN, RESULTS);
-    private static Map<String, Map<String, Object>> workers = new HashMap<>();
 
-    public static void getWorkerStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public static void getWorkerStatus(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            WorkersMap workers
+    ) throws IOException {
         HashMap<String, Object> workerStatus = new HashMap<>();
         workerStatus.put(IP, request.getRemoteAddr());
         workerStatus.put(LAST_ACTIVE, Instant.now());
@@ -64,11 +65,15 @@ public class MasterStatus {
         return true;
     }
 
-    public static void getStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public static void getStatus(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            WorkersMap workers
+    ) throws IOException {
         PrintWriter writer = response.getWriter();
         writer.println("<html><head><title>Status</title></head><body>");
 
-        printStatusTable(writer);
+        printStatusTable(writer, workers);
         printStatusForm(writer);
 
         writer.println("</body></html>");
@@ -84,23 +89,20 @@ public class MasterStatus {
         writer.println("</form>");
     }
 
-    private static void printStatusTable(PrintWriter writer) {
+    private static void printStatusTable(PrintWriter writer, WorkersMap workers) {
         writer.println("<table>");
         writer.println("<thead><tr><th>IP:port</th><th>status</th><th>job</th><th>keys read</th><th>keys written</th></tr></thead>");
         writer.println("<tbody>");
 
-        workers.forEach((k, worker) -> {
-            Instant lastActive = (Instant) worker.get(LAST_ACTIVE);
-            if (lastActive.isAfter(Instant.now().minusSeconds(ACTIVE_DURATION))) {
-                writer.format(
-                        "<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>\n",
-                        worker.get(ID),
-                        worker.get(STATUS),
-                        worker.get(JOB),
-                        worker.get(KEYS_READ),
-                        worker.get(KEYS_WRITTEN)
-                );
-            }
+        workers.getActiveWorkers().forEach(worker -> {
+            writer.format(
+                    "<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>\n",
+                    worker.get(ID),
+                    worker.get(STATUS),
+                    worker.get(JOB),
+                    worker.get(KEYS_READ),
+                    worker.get(KEYS_WRITTEN)
+            );
         });
 
         writer.println("</tbody>");

@@ -1,13 +1,11 @@
 package edu.upenn.cis455.mapreduce.master;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upenn.cis.stormlite.Config;
 import edu.upenn.cis.stormlite.Topology;
 import edu.upenn.cis.stormlite.TopologyBuilder;
 import edu.upenn.cis.stormlite.bolt.MapBolt;
 import edu.upenn.cis.stormlite.bolt.ReduceBolt;
-import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.distributed.WorkerJob;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import test.edu.upenn.cis.stormlite.PrintBolt;
@@ -36,7 +34,11 @@ public class MasterLaunch {
 
     private final static List<String> params = Arrays.asList(CLASS_NAME, INPUT_DIR, OUTPUT_DIR, MAP_THREADS, REDUCE_THREADS);
 
-    static void postLaunch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    static void postLaunch(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            WorkersMap workers
+    ) throws IOException {
         HashMap<String, Object> fields = new HashMap<>();
 
         params.forEach(param -> {
@@ -45,15 +47,21 @@ public class MasterLaunch {
 
         boolean success = normalizeLaunch(response, fields);
         if (success) {
-            sendDefineJob(request, fields);
+            sendDefineJob(request, fields, workers);
             sendRunJob();
         }
     }
 
-    private static void sendDefineJob(HttpServletRequest request, HashMap<String, Object> fields) throws IOException {
+    private static Config makeConfig(
+            HttpServletRequest request,
+            HashMap<String, Object> fields,
+            WorkersMap workers
+    ) {
         Config config = new Config();
 
         // TODO based on status
+
+
         config.put("workerList", "[127.0.0.1:8000,127.0.0.1:8001]");
 
 //        if (args.length >= 1) {
@@ -72,6 +80,15 @@ public class MasterLaunch {
         config.put("spoutExecutors", "1");
         config.put("mapExecutors", (String) fields.get(MAP_THREADS));
         config.put("reduceExecutors", (String) fields.get(REDUCE_THREADS));
+        return config;
+    }
+
+    private static void sendDefineJob(
+            HttpServletRequest request,
+            HashMap<String, Object> fields,
+            WorkersMap workers
+    ) throws IOException {
+        Config config = makeConfig(request, fields, workers);
 
         TopologyBuilder builder = new TopologyBuilder();
 
@@ -105,29 +122,29 @@ public class MasterLaunch {
         mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 
         // now this sends to each worker
-        try {
-            String[] workers = WorkerHelper.getWorkers(config);
-
-            int i = 0;
-            for (String dest : workers) {
-                config.put("workerIndex", String.valueOf(i++));
-                if (sendJob(dest, "POST", config, "definejob",
-                        mapper.writerWithDefaultPrettyPrinter().writeValueAsString(job)).getResponseCode() !=
-                        HttpURLConnection.HTTP_OK) {
-                    throw new RuntimeException("Job definition request failed");
-                }
-            }
-            for (String dest : workers) {
-                if (sendJob(dest, "POST", config, "runjob", "").getResponseCode() !=
-                        HttpURLConnection.HTTP_OK) {
-                    throw new RuntimeException("Job execution request failed");
-                }
-            }
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            System.exit(0);
-        }
+//        try {
+//            String[] workers = WorkerHelper.getWorkers(config);
+//
+//            int i = 0;
+//            for (String dest : workers) {
+//                config.put("workerIndex", String.valueOf(i++));
+//                if (sendJob(dest, "POST", config, "definejob",
+//                        mapper.writerWithDefaultPrettyPrinter().writeValueAsString(job)).getResponseCode() !=
+//                        HttpURLConnection.HTTP_OK) {
+//                    throw new RuntimeException("Job definition request failed");
+//                }
+//            }
+//            for (String dest : workers) {
+//                if (sendJob(dest, "POST", config, "runjob", "").getResponseCode() !=
+//                        HttpURLConnection.HTTP_OK) {
+//                    throw new RuntimeException("Job execution request failed");
+//                }
+//            }
+//        } catch (JsonProcessingException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//            System.exit(0);
+//        }
     }
 
     private static HttpURLConnection sendJob(String dest, String post, Config config, String runjob, String s) {
