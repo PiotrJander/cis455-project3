@@ -66,21 +66,25 @@ public class DistributedCluster implements Runnable {
 																// between EOS propagation and tuple propagation!
 	
 	Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<Runnable>();
-	
 
-	public TopologyContext submitTopology(String name, Config config, 
-			Topology topo) throws ClassNotFoundException {
-		theTopology = name;
-		
+
+    public TopologyContext submitTopology(String name, Config config,
+                                          Topology topo) throws ClassNotFoundException {
+        theTopology = name;
+
 		context = new TopologyContext(topo, taskQueue);
-		
+
+        boltStreams.clear();
+        spoutStreams.clear();
+        streams.clear();
+
 		createSpoutInstances(topo, config);
-		scheduleSpouts();
-		
-		createBoltInstances(topo, config);
-		
-		createRoutes(topo, config);
-		
+
+        createBoltInstances(topo, config);
+
+        createRoutes(topo, config);
+        scheduleSpouts();
+
 		return context;
 	}
 	

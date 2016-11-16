@@ -90,6 +90,9 @@ public class ReduceBolt implements IRichBolt {
         }
 
         // TODO: determine how many EOS votes needed
+
+        // TODO create a db here
+
     }
 
     /**

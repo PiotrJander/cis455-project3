@@ -72,7 +72,7 @@ public class MapBolt implements IRichBolt {
     		TopologyContext context, OutputCollector collector) {
         this.collector = collector;
         this.context = context;
-        
+
         if (!stormConf.containsKey("mapClass"))
         	throw new RuntimeException("Mapper class is not specified as a config option");
         else {
