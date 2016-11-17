@@ -128,10 +128,10 @@ public class ReduceBolt implements IRichBolt {
     	} else {
     		String key = input.getStringByField("key");
 	        String value = input.getStringByField("value");
-	        log.debug(getExecutorId() + " received " + key + " / " + value);
+            log.info(getExecutorId() + " received " + key + " / " + value);
 
             ReduceBoltStore.addEntry(key, value);
-            log.debug("Adding item to " + key + " / " + stateByKey.get(key).size());
+            log.info("Adding item to " + key + " / " + stateByKey.get(key).size());
         }
     }
 

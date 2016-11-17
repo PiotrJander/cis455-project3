@@ -104,7 +104,7 @@ public class WorkerServer {
 					String stream = arg0.params(":stream");
 					Tuple tuple = om.readValue(arg0.body(), Tuple.class);
 
-                    log.debug("Worker received: " + tuple + " for " + stream);
+                    log.info("Worker received: " + tuple + " for " + stream);
 
                     // Find the destination stream and route to it
 					StreamRouter router = cluster.getStreamRouter(stream);
@@ -145,7 +145,7 @@ public class WorkerServer {
 			String[] addresses = WorkerHelper.getWorkers(config);
 			String myAddress = addresses[Integer.valueOf(config.get("workerIndex"))];
 
-			log.debug("Initializing worker " + myAddress);
+            log.info("Initializing worker " + myAddress);
 
 			URL url;
 			try {

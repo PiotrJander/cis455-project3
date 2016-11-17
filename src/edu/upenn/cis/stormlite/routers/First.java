@@ -17,12 +17,11 @@
  */
 package edu.upenn.cis.stormlite.routers;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import edu.upenn.cis.stormlite.bolt.IRichBolt;
 import org.apache.log4j.Logger;
 
-import edu.upenn.cis.stormlite.bolt.IRichBolt;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Does round-robin among the destination bolts
@@ -63,10 +62,10 @@ public class First extends StreamRouter {
 		}
 		
 		IRichBolt bolt = getBolts().get(0);
-		
-		log.debug("Routing " + tuple.toString() + " to " + bolt.getExecutorId());
-		
-		return bolt;
+
+        log.info("Routing " + tuple.toString() + " to " + bolt.getExecutorId());
+
+        return bolt;
 	}
 
 

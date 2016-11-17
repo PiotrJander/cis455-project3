@@ -132,7 +132,7 @@ public class DistributedCluster implements Runnable {
 					
 					newSpout.open(config, context, collector);
 					spoutStreams.get(key).add(newSpout);
-					log.debug("Created a spout executor " + key + "/" + newSpout.getExecutorId() + " of type " + spout.getLeft());
+					log.info("Created a spout executor " + key + "/" + newSpout.getExecutorId() + " of type " + spout.getLeft());
 				} catch (InstantiationException e) {
 					// Auto-generated catch block
 					e.printStackTrace();
@@ -163,7 +163,7 @@ public class DistributedCluster implements Runnable {
 					IRichBolt newBolt = (IRichBolt)Class.forName(bolt.getLeft()).newInstance();
 					newBolt.prepare(config, context, collector);
 					boltStreams.get(key).add(newBolt);
-					log.debug("Created a bolt executor " + key + "/" + newBolt.getExecutorId() + " of type " + bolt.getLeft());
+					log.info("Created a bolt executor " + key + "/" + newBolt.getExecutorId() + " of type " + bolt.getLeft());
 				} catch (InstantiationException e) {
 					// Auto-generated catch block
 					e.printStackTrace();
@@ -203,14 +203,14 @@ public class DistributedCluster implements Runnable {
 					sender.prepare(config, context, null);
 					for (int i = 0; i < count; i++) {
 						router.addRemoteBolt(sender);
-						log.debug("Adding a remote route from " + stream + " to " + worker);
+						log.info("Adding a remote route from " + stream + " to " + worker);
 					}
 					
 				// Create one local executor for each node for us!
 				} else {
 					for (IRichBolt bolt: boltStreams.get(stream)) {
 						router.addBolt(bolt);
-						log.debug("Adding a route from " + decl.getStream() + " to " + bolt);
+						log.info("Adding a route from " + decl.getStream() + " to " + bolt);
 					}
 				}
 			}

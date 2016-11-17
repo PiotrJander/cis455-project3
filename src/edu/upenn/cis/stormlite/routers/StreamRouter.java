@@ -17,6 +17,15 @@
  */
 package edu.upenn.cis.stormlite.routers;
 
+import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
+import edu.upenn.cis.stormlite.TopologyContext;
+import edu.upenn.cis.stormlite.bolt.IRichBolt;
+import edu.upenn.cis.stormlite.distributed.SenderBolt;
+import edu.upenn.cis.stormlite.tasks.BoltTask;
+import edu.upenn.cis.stormlite.tuple.Fields;
+import edu.upenn.cis.stormlite.tuple.Tuple;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,17 +33,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
-import edu.upenn.cis.stormlite.TopologyContext;
-import edu.upenn.cis.stormlite.bolt.IRichBolt;
-import edu.upenn.cis.stormlite.distributed.SenderBolt;
-import edu.upenn.cis.stormlite.spout.FileSpout;
-import edu.upenn.cis.stormlite.tasks.BoltTask;
-import edu.upenn.cis.stormlite.tuple.Fields;
-import edu.upenn.cis.stormlite.tuple.Tuple;
 
 /**
  * A StreamRouter is an internal class used to determine where
@@ -131,10 +129,10 @@ public abstract class StreamRouter implements OutputFieldsDeclarer {
 	 */
 	public synchronized void execute(List<Object> tuple, TopologyContext context) {
 			IRichBolt bolt = getBoltFor(tuple);
-			
-			log.debug("Task queued: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
-			
-			if (bolt != null)
+
+        log.info("Task queued: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
+
+        if (bolt != null)
 				context.addStreamTask(new BoltTask(bolt, new Tuple(schema, tuple)));
 			else
 				throw new RuntimeException("Unable to find a bolt for the tuple");
@@ -152,9 +150,9 @@ public abstract class StreamRouter implements OutputFieldsDeclarer {
 				if (retries >= getBolts().size())
 					throw new RuntimeException("Trying to route to a local bolt executor, but our router seems to only return remote ones");
 			}
-			
-			log.debug("Task queued from other worker: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
-			if (bolt != null)
+
+        log.info("Task queued from other worker: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
+        if (bolt != null)
 				context.addStreamTask(new BoltTask(bolt, new Tuple(schema, tuple)));
 			else
 				throw new RuntimeException("Unable to find a bolt for the tuple");
@@ -192,16 +190,16 @@ public abstract class StreamRouter implements OutputFieldsDeclarer {
 	 */
 	public synchronized void executeEndOfStream(TopologyContext context) {
 		for (IRichBolt bolt: getBolts()) {
-			log.debug("Task queued: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): (EOS)");
-			context.addStreamTask(new BoltTask(bolt, Tuple.getEndOfStream()));
+            log.info("Task queued: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): (EOS)");
+            context.addStreamTask(new BoltTask(bolt, Tuple.getEndOfStream()));
 		}
 	}
 
 	public synchronized void executeEndOfStreamLocally(TopologyContext context) {
 		for (IRichBolt bolt: getBolts())
 			if (!isRemoteBolt(bolt)) {
-				log.debug("Task queued from other worker: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): (EOS)");
-				context.addStreamTask(new BoltTask(bolt, Tuple.getEndOfStream()));
+                log.info("Task queued from other worker: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): (EOS)");
+                context.addStreamTask(new BoltTask(bolt, Tuple.getEndOfStream()));
 			}
 	}
 

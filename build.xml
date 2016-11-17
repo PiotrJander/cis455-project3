@@ -19,6 +19,23 @@
     <mkdir dir="target/master/WEB-INF/classes"/>
     <mkdir dir="target/worker/WEB-INF/classes"/>
     <mkdir dir="classes"/>
+
+    <!-- TODO does this help? -->
+    <copy todir="target/master/WEB-INF/classes" overwrite="true">
+      <fileset dir="${resources.dir}">
+        <include name="**"/>
+      </fileset>
+    </copy>
+    <copy todir="target/worker/WEB-INF/classes" overwrite="true">
+      <fileset dir="${resources.dir}">
+        <include name="**"/>
+      </fileset>
+    </copy>
+    <copy todir="classes" overwrite="true">
+      <fileset dir="${resources.dir}">
+        <include name="**"/>
+      </fileset>
+    </copy>
   </target>
 
   <target name="compile-jobs" depends="init">

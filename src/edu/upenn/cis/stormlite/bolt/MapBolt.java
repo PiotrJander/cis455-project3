@@ -104,9 +104,9 @@ public class MapBolt implements IRichBolt {
     	if (!input.isEndOfStream()) {
 	        String key = input.getStringByField("key");
 	        String value = input.getStringByField("value");
-	        log.debug(getExecutorId() + " received " + key + " / " + value);
-	        
-	        if (neededVotesToComplete == 0)
+            log.info(getExecutorId() + " received " + key + " / " + value);
+
+            if (neededVotesToComplete == 0)
 	        	throw new RuntimeException("We received data after we thought the stream had ended!");
 
             mapJob.map(input.getStringByField("key"), input.getStringByField("value"), collector);

@@ -77,10 +77,10 @@ public abstract class FileSpout implements IRichSpout {
         
         try {
             File path = new File(conf.get("inputDir"), this.filename);
-            log.debug("Starting spout for " + path);
-            log.debug(getExecutorId() + " opening file reader");
-        	
-        	// If we have a worker index, read appropriate file among xyz.txt.0, xyz.txt.1, etc.
+            log.info("Starting spout for " + path);
+            log.info(getExecutorId() + " opening file reader");
+
+            // If we have a worker index, read appropriate file among xyz.txt.0, xyz.txt.1, etc.
         	if (conf.containsKey("workerIndex"))
                 reader = new BufferedReader(new FileReader(path + "." + conf.get("workerIndex")));
             else
@@ -116,12 +116,12 @@ public abstract class FileSpout implements IRichSpout {
 	    	try {
 		    	String line = reader.readLine();
 		    	if (line != null) {
-		        	log.debug(getExecutorId() + " read from file " + getFilename() + ": " + line);
-		    		String[] words = line.split("[ \\t\\,.]");
+                    log.info(getExecutorId() + " read from file " + getFilename() + ": " + line);
+                    String[] words = line.split("[ \\t\\,.]");
 		
 		    		for (String word: words) {
-		            	log.debug(getExecutorId() + " emitting " + word);
-		    	        this.collector.emit(new Values<Object>(String.valueOf(inx++), word));
+                        log.info(getExecutorId() + " emitting " + word);
+                        this.collector.emit(new Values<Object>(String.valueOf(inx++), word));
 		    		}
 		    	} else if (!sentEof) {
 		        	log.info(getExecutorId() + " finished file " + getFilename() + " and emitting EOS");

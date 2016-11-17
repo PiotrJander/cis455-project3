@@ -63,7 +63,7 @@ public class WordSpout implements IRichSpout {
 	String[] words = {"big", "bad", "wolf", "little", "red", "riding", "hood"};
 
     public WordSpout() {
-    	log.debug("Starting spout");
+        log.info("Starting spout");
     }
 
 
@@ -77,8 +77,8 @@ public class WordSpout implements IRichSpout {
         this.collector = collector;
         
         try {
-        	log.debug(getExecutorId() + " opening file reader");
-			reader = new BufferedReader(new FileReader("words.txt"));
+            log.info(getExecutorId() + " opening file reader");
+            reader = new BufferedReader(new FileReader("words.txt"));
 		} catch (FileNotFoundException e) {
 			// Auto-generated catch block
 			e.printStackTrace();
@@ -110,18 +110,18 @@ public class WordSpout implements IRichSpout {
 	    	try {
 		    	String line = reader.readLine();
 		    	if (line != null) {
-		        	log.debug(getExecutorId() + " read from file " + line);
-		    		String[] words = line.split("[ \\t\\,.]");
+                    log.info(getExecutorId() + " read from file " + line);
+                    String[] words = line.split("[ \\t\\,.]");
 		
 		    		for (String word: words) {
-		            	log.debug(getExecutorId() + " emitting " + word);
-		    	        this.collector.emit(new Values<Object>(word));
+                        log.info(getExecutorId() + " emitting " + word);
+                        this.collector.emit(new Values<Object>(word));
 		    		}
 		    	} else {
 		    		int pos = r.nextInt(words.length);
 		    		String word = words[pos];
-	            	log.debug(getExecutorId() + " emitting " + word);
-	    	        this.collector.emit(new Values<Object>(word));
+                    log.info(getExecutorId() + " emitting " + word);
+                    this.collector.emit(new Values<Object>(word));
 		    	}
 	    	} catch (IOException e) {
 	    		e.printStackTrace();

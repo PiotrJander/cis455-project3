@@ -91,10 +91,10 @@ public class SenderBolt implements IRichBolt {
      */
     private synchronized void send(Tuple tuple) throws IOException {
     	isEndOfStream = tuple.isEndOfStream();
-    	
-		log.debug("Sender is routing " + tuple.toString() + " to " + address + "/" + stream);
-		
-		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+
+        log.info("Sender is routing " + tuple.toString() + " to " + address + "/" + stream);
+
+        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestProperty("Content-Type", "application/json");
 		String jsonForTuple = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tuple);
 

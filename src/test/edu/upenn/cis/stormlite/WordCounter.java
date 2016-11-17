@@ -1,11 +1,5 @@
 package test.edu.upenn.cis.stormlite;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
 import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
 import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.bolt.IRichBolt;
@@ -14,6 +8,11 @@ import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
 import edu.upenn.cis.stormlite.tuple.Values;
+import org.apache.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Simple word counter, largely derived from
@@ -42,23 +41,20 @@ public class WordCounter implements IRichBolt {
 	static Logger log = Logger.getLogger(WordCounter.class);
 	
 	Fields schema = new Fields("word", "count");
-	
-	/**
-	 * This is a simple map from word to a running count.
-	 * If we have multiple "sharded" copies of the WordCounter
-	 * we'll need to make sure they get different words, otherwise
-	 * we'll have multiple partial counts instead of a single unified
-	 * one.
-	 * 
-	 */
-	private Map<String, Integer> wordCounter = new HashMap<>();
-    
     /**
      * To make it easier to debug: we have a unique ID for each
      * instance of the WordCounter, aka each "executor"
      */
     String executorId = UUID.randomUUID().toString();
-    
+    /**
+	 * This is a simple map from word to a running count.
+	 * If we have multiple "sharded" copies of the WordCounter
+	 * we'll need to make sure they get different words, otherwise
+	 * we'll have multiple partial counts instead of a single unified
+	 * one.
+     *
+     */
+	private Map<String, Integer> wordCounter = new HashMap<>();
     /**
      * This is where we send our output stream
      */
@@ -84,7 +80,7 @@ public class WordCounter implements IRichBolt {
     public void execute(Tuple input) {
         String word = input.getStringByField("word");
         int count;
-        log.debug(getExecutorId() + " received " + word);
+        log.info(getExecutorId() + " received " + word);
         if (wordCounter.containsKey(word)) {
             count = wordCounter.get(word) + 1;
             wordCounter.put(word, wordCounter.get(word) + 1);
