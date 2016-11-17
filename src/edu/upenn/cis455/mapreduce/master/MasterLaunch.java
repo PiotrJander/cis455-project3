@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -69,7 +68,10 @@ public class MasterLaunch {
             return false;
         }
 
-        // TODO normalize dirs and class name
+        String inputDir = fields.get(INPUT_DIR).replaceFirst("^~", System.getProperty("user.home"));
+        String outputDir = fields.get(OUTPUT_DIR).replaceFirst("^~", System.getProperty("user.home"));
+        fields.put(INPUT_DIR, inputDir);
+        fields.put(OUTPUT_DIR, outputDir);
 
         return true;
     }
@@ -77,11 +79,15 @@ public class MasterLaunch {
     private static Config makeConfig(HttpServletRequest request, HashMap<String, String> fields, WorkersMap workers) {
         Config config = new Config();
 
-        String activeWorkers = workers.getActiveWorkers()
-                .map(worker -> (String) worker.get("id"))
-                .collect(Collectors.joining(","));
+        // TODO poll active workers
+//        String activeWorkers = workers.getActiveWorkers()
+//                .map(worker -> (String) worker.get("id"))
+//                .collect(Collectors.joining(","));
+//
+//        config.put("workerList", "[" + activeWorkers + "]");
 
-        config.put("workerList", "[" + activeWorkers + "]");
+        config.put("workerList", "[127.0.0.1:8000,127.0.0.1:8001]");
+
         config.put("job", String.format("%s%03d", fields.get(CLASS_NAME), jobCounter++));
         config.put("master", request.getLocalAddr() + ":" + request.getLocalPort());
 

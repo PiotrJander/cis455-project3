@@ -5,7 +5,6 @@ import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
-import edu.upenn.cis455.mapreduce.Context;
 import edu.upenn.cis455.mapreduce.Job;
 import org.apache.log4j.Logger;
 
@@ -109,8 +108,8 @@ public class MapBolt implements IRichBolt {
 	        
 	        if (neededVotesToComplete == 0)
 	        	throw new RuntimeException("We received data after we thought the stream had ended!");
-	        
-            mapJob.map(input.getStringByField("key"), input.getStringByField("value"), (Context) context);
+
+            mapJob.map(input.getStringByField("key"), input.getStringByField("value"), collector);
 
     	} else if (input.isEndOfStream()) {
             neededVotesToComplete--;

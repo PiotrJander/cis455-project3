@@ -5,7 +5,6 @@ import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
-import edu.upenn.cis455.mapreduce.Context;
 import edu.upenn.cis455.mapreduce.Job;
 import edu.upenn.cis455.mapreduce.worker.ReduceBoltStore;
 import org.apache.log4j.Logger;
@@ -96,7 +95,7 @@ public class ReduceBolt implements IRichBolt {
         }
 
         // init db
-        ReduceBoltStore.init(new File("~/store/" + executorId));
+        ReduceBoltStore.init(new File(System.getProperty("user.home") + "/store/" + executorId));
 
         int numberOfWorkers = stormConf.get("workerList").split(",").length;
         int mapExecutors = Integer.parseInt(stormConf.get("mapExecutors"));
@@ -120,7 +119,7 @@ public class ReduceBolt implements IRichBolt {
 
             if (neededVotesToComplete == 0) {
                 ReduceBoltStore.getAllEntries().forEachRemaining(entry -> {
-                    reduceJob.reduce(entry.getKey(), entry.getValues().iterator(), (Context) context);
+                    reduceJob.reduce(entry.getKey(), entry.getValues().iterator(), collector);
                 });
                 collector.emitEndOfStream();
             }

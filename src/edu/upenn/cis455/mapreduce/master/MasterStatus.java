@@ -16,7 +16,7 @@ public class MasterStatus {
     private final static String IP = "ip";
     private final static String LAST_ACTIVE = "lastActive";
     private final static String PORT = "port";
-    private final static String STATUS = "getStatus";
+    private final static String STATUS = "status";
     private final static String JOB = "job";
     private final static String KEYS_READ = "keysRead";
     private final static String KEYS_WRITTEN = "keysWritten";
