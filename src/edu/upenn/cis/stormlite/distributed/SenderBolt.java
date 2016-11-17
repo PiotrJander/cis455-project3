@@ -8,6 +8,7 @@ import edu.upenn.cis.stormlite.bolt.OutputCollector;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
+import edu.upenn.cis455.utils.HttpClient;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -96,10 +97,10 @@ public class SenderBolt implements IRichBolt {
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		conn.setRequestProperty("Content-Type", "application/json");
 		String jsonForTuple = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tuple);
-		
-		// TODO: send this to /pushdata/{stream} as a POST!
-		
-		conn.disconnect();
+
+        HttpClient.post(address, jsonForTuple);
+
+        conn.disconnect();
     }
 
     /**

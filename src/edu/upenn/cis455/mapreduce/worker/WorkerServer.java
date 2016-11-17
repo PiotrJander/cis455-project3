@@ -198,7 +198,7 @@ public class WorkerServer {
                 // TODO pass master address
                 try {
                     HttpURLConnection conn =
-                            HttpClient.get("http://localhost:8080/workerstatus", "GET", state.getStateAsMap());
+                            HttpClient.get("http://localhost:8080/workerstatus", state.getStateAsMap());
                     if (conn.getResponseCode() != 200) {
                         System.err.println("Report status request error");
                     }
