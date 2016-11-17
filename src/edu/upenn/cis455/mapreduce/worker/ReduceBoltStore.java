@@ -5,31 +5,31 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
-import com.sleepycat.persist.SecondaryIndex;
 import com.sleepycat.persist.StoreConfig;
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
-import com.sleepycat.persist.model.Relationship;
-import com.sleepycat.persist.model.SecondaryKey;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class ReduceBoltStore {
 
+    private static final String dbName = "ReduceBoltStore";
     private static Environment env;
     private static EntityStore store;
     private static EntryAccessor entryAccessor;
 
     public static void init(File envHome) throws DatabaseException {
 
-        // TODO do we create the dir?
-//        // create the directory if it doesn't exist
-//        try {
-//            //noinspection ResultOfMethodCallIgnored
-//            envHome.mkdirs();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            envHome.mkdirs();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
@@ -39,7 +39,10 @@ public class ReduceBoltStore {
         StoreConfig storeConfig = new StoreConfig();
         storeConfig.setAllowCreate(true);
         storeConfig.setTransactional(true);
-        store = new EntityStore(env, "ReduceBoltStore", storeConfig);
+        store = new EntityStore(env, dbName, storeConfig);
+
+        // empty db
+        store.truncateClass(Entry.class);
 
         entryAccessor = new EntryAccessor(store);
     }
@@ -67,44 +70,69 @@ public class ReduceBoltStore {
         }
     }
 
-    private static void addEntry(String key, String value) {
-        entryAccessor.pi.put(new Entry(key, value));
+    public static void addEntry(String key, String value) {
+        Entry entry = entryAccessor.pi.get(key);
+        if (entry == null) {
+            entryAccessor.pi.put(new Entry(key, value));
+        } else {
+            entry.addValue(value);
+            entryAccessor.pi.put(entry);
+        }
     }
 
+    public static List<String> getValues(String key) {
+        Entry entry = entryAccessor.pi.get(key);
+        if (entry == null) {
+            return null;
+        } else {
+            return entry.values;
+        }
+    }
+
+    public static Iterator<Entry> getAllEntries() {
+        return entryAccessor.pi.entities().iterator();
+    }
 
     @Entity
-    private static class Entry {
+    public static class Entry {
 
-        static int pkCounter = 0;
         @PrimaryKey
-        int pk;
-        @SecondaryKey(relate = Relationship.MANY_TO_ONE)
         String key;
-        String value;
 
-        public Entry(String key, String value) {
-            this.pk = getPkAndInc();
+        ArrayList<String> values;
+
+        public Entry(String key) {
             this.key = key;
-            this.value = value;
+            this.values = new ArrayList<>();
+        }
+
+        Entry(String key, String value) {
+            this.key = key;
+            this.values = new ArrayList<>(Collections.singletonList(value));
         }
 
         public Entry() {
         }
 
-        static int getPkAndInc() {
-            return pkCounter++;
+        void addValue(String v) {
+            values.add(v);
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public ArrayList<String> getValues() {
+            return values;
         }
     }
 
     private static class EntryAccessor {
 
-        PrimaryIndex<Integer, Entry> pi;
-
-        SecondaryIndex<String, Integer, Entry> si;
+        PrimaryIndex<String, Entry> pi;
 
         EntryAccessor(EntityStore store) throws DatabaseException {
-            pi = store.getPrimaryIndex(Integer.class, Entry.class);
-            si = store.getSecondaryIndex(pi, String.class, "key");
+            pi = store.getPrimaryIndex(String.class, Entry.class);
         }
     }
 }

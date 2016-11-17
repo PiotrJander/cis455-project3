@@ -5,10 +5,16 @@ import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
+import edu.upenn.cis455.mapreduce.Context;
 import edu.upenn.cis455.mapreduce.Job;
+import edu.upenn.cis455.mapreduce.worker.ReduceBoltStore;
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A simple adapter that takes a MapReduce "Job" and calls the "reduce"
@@ -89,9 +95,12 @@ public class ReduceBolt implements IRichBolt {
         	throw new RuntimeException("Reducer class doesn't know how many map bolt executors");
         }
 
-        // TODO: determine how many EOS votes needed
+        // init db
+        ReduceBoltStore.init(new File("~/store/" + executorId));
 
-        // TODO create a db here
+        int numberOfWorkers = stormConf.get("workerList").split(",").length;
+        int mapExecutors = Integer.parseInt(stormConf.get("mapExecutors"));
+        neededVotesToComplete = numberOfWorkers + mapExecutors - 2;
 
     }
 
@@ -106,25 +115,25 @@ public class ReduceBolt implements IRichBolt {
 	        	throw new RuntimeException("We received data after we thought the stream had ended!");
     		// Already done!
 		} else if (input.isEndOfStream()) {
-			
-			// TODO: only if at EOS do we trigger the reduce operation and output all state
+
+            neededVotesToComplete--;
+
+            if (neededVotesToComplete == 0) {
+                ReduceBoltStore.getAllEntries().forEachRemaining(entry -> {
+                    reduceJob.reduce(entry.getKey(), entry.getValues().iterator(), (Context) context);
+                });
+                collector.emitEndOfStream();
+            }
 
 			sentEof = true;
     	} else {
-    		// TODO: this is a plain ol' hash map, replace it with BerkeleyDB
-    		
     		String key = input.getStringByField("key");
 	        String value = input.getStringByField("value");
 	        log.debug(getExecutorId() + " received " + key + " / " + value);
-	        
-	        synchronized (stateByKey) {
-		        if (!stateByKey.containsKey(key))
-		        	stateByKey.put(key, new ArrayList<>());
-		        else
-		        	log.debug("Adding item to " + key + " / " + stateByKey.get(key).size());
-		        stateByKey.get(key).add(value);
-	        }
-    	}        
+
+            ReduceBoltStore.addEntry(key, value);
+            log.debug("Adding item to " + key + " / " + stateByKey.get(key).size());
+        }
     }
 
     /**
@@ -132,6 +141,7 @@ public class ReduceBolt implements IRichBolt {
      */
     @Override
     public void cleanup() {
+        ReduceBoltStore.close();
     }
 
     /**

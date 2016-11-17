@@ -90,8 +90,10 @@ public class MapBolt implements IRichBolt {
         if (!stormConf.containsKey("spoutExecutors")) {
         	throw new RuntimeException("Mapper class doesn't know how many input spout executors");
         }
-        
-        // TODO: determine how many end-of-stream requests are needed
+
+        int numberOfWorkers = stormConf.get("workerList").split(",").length;
+        int spoutExecutors = Integer.parseInt(stormConf.get("spoutExecutors"));
+        neededVotesToComplete = numberOfWorkers + spoutExecutors - 2;
     }
 
     /**
@@ -112,9 +114,11 @@ public class MapBolt implements IRichBolt {
             mapJob.map(input.getStringByField("key"), input.getStringByField("value"), (Context) context);
 
     	} else if (input.isEndOfStream()) {
-    		// TODO: determine what to do with EOS
-
-    	}
+            neededVotesToComplete--;
+            if (neededVotesToComplete == 0) {
+                collector.emitEndOfStream();
+            }
+        }
     }
 
     /**
