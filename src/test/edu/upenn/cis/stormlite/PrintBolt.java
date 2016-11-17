@@ -37,8 +37,12 @@ public class PrintBolt implements IRichBolt {
     private Path outputFile;
     private PrintWriter writer;
 
+    private int eosExpected;
+
     @Override
     public void cleanup() {
+
+        log.info("PrintBolt Closing the file.");
 
         writer.close();
 
@@ -48,12 +52,29 @@ public class PrintBolt implements IRichBolt {
     public void execute(Tuple input) {
 
         if (!input.isEndOfStream()) {
-            writer.println(input.getStringByField("key") + "," + input.getStringByField("value"));
+
+            String line = input.getStringByField("key") + "," + input.getStringByField("value");
+            writer.println(line);
+
+            log.info("PrintBolt " + executorId + " writing line " + line);
+        } else {
+            eosExpected--;
+
+            log.info("PrintBolt " + executorId + " received EOS; still expecting " + eosExpected + " EOSs");
+
+            if (eosExpected == 0) {
+                log.info("PrintBolt " + executorId + " received all EOS; finishing");
+                writer.flush();
+                writer.close();
+            }
         }
     }
 
     @Override
     public void prepare(Map<String, String> stormConf, TopologyContext context, OutputCollector collector) {
+
+        // TODO don't hardcode
+        eosExpected = 2;
 
         outputFile = Paths.get(stormConf.get("outputDir"), "output.txt");
 
