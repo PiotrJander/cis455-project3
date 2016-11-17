@@ -82,11 +82,14 @@ public class MasterLaunch {
                 .collect(Collectors.joining(","));
 
         config.put("workerList", "[" + activeWorkers + "]");
-        config.put("job", String.format("MyJob%03d", jobCounter++));
+        config.put("job", String.format("%s%03d", fields.get(CLASS_NAME), jobCounter++));
         config.put("master", request.getLocalAddr() + ":" + request.getLocalPort());
 
         config.put("mapClass", fields.get(CLASS_NAME));
         config.put("reduceClass", fields.get(CLASS_NAME));
+
+        config.put("inputDir", fields.get(INPUT_DIR));
+        config.put("outputDir", fields.get(OUTPUT_DIR));
 
         config.put("spoutExecutors", "1");
         config.put("mapExecutors", fields.get(MAP_THREADS));
@@ -131,6 +134,7 @@ public class MasterLaunch {
         // TODO possibly add worker index to config
         IntStream.range(0, activeWorkers.length).forEach(i -> {
             try {
+                job.getConfig().put("workerIndex", String.valueOf(i));
                 String workerAddress = activeWorkers[i];
                 String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(job);
                 if (sendJob(workerAddress, "POST", "/definejob", json).getResponseCode() != HttpURLConnection.HTTP_OK) {

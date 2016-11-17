@@ -7,10 +7,7 @@ import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Values;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -75,19 +72,20 @@ public abstract class FileSpout implements IRichSpout {
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+    public void open(Map<String, String> conf, TopologyContext context, SpoutOutputCollector collector) {
         this.collector = collector;
         
         try {
-        	log.debug("Starting spout for " + filename);
-        	log.debug(getExecutorId() + " opening file reader");
+            File path = new File(conf.get("inputDir"), this.filename);
+            log.debug("Starting spout for " + path);
+            log.debug(getExecutorId() + " opening file reader");
         	
         	// If we have a worker index, read appropriate file among xyz.txt.0, xyz.txt.1, etc.
         	if (conf.containsKey("workerIndex"))
-        		reader = new BufferedReader(new FileReader(filename + "." + conf.get("workerIndex")));
-        	else
-        		reader = new BufferedReader(new FileReader(filename));
-		} catch (FileNotFoundException e) {
+                reader = new BufferedReader(new FileReader(path + "." + conf.get("workerIndex")));
+            else
+                reader = new BufferedReader(new FileReader(path));
+        } catch (FileNotFoundException e) {
 			// Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -1,10 +1,5 @@
 package test.edu.upenn.cis.stormlite;
 
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
 import edu.upenn.cis.stormlite.OutputFieldsDeclarer;
 import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.bolt.IRichBolt;
@@ -12,60 +7,82 @@ import edu.upenn.cis.stormlite.bolt.OutputCollector;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis.stormlite.tuple.Fields;
 import edu.upenn.cis.stormlite.tuple.Tuple;
+import org.apache.log4j.Logger;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A trivial bolt that simply outputs its input stream to the
  * console
- * 
- * @author zives
  *
+ * @author zives
  */
 public class PrintBolt implements IRichBolt {
-	static Logger log = Logger.getLogger(PrintBolt.class);
-	
-	Fields myFields = new Fields();
+    static Logger log = Logger.getLogger(PrintBolt.class);
 
+    Fields myFields = new Fields("key", "value");
     /**
      * To make it easier to debug: we have a unique ID for each
      * instance of the PrintBolt, aka each "executor"
      */
     String executorId = UUID.randomUUID().toString();
+    private Path outputFile;
+    private PrintWriter writer;
 
-	@Override
-	public void cleanup() {
-		// Do nothing
+    @Override
+    public void cleanup() {
 
-	}
+        writer.close();
 
-	@Override
-	public void execute(Tuple input) {
-		if (!input.isEndOfStream())
-			System.out.println(getExecutorId() + ": " + input.toString());
-	}
+    }
 
-	@Override
-	public void prepare(Map<String, String> stormConf, TopologyContext context, OutputCollector collector) {
-		// Do nothing
-	}
+    @Override
+    public void execute(Tuple input) {
 
-	@Override
-	public String getExecutorId() {
-		return executorId;
-	}
+        if (!input.isEndOfStream()) {
+            writer.println(input.getStringByField("key") + "," + input.getStringByField("value"));
+        }
+    }
 
-	@Override
-	public void setRouter(StreamRouter router) {
-		// Do nothing
-	}
+    @Override
+    public void prepare(Map<String, String> stormConf, TopologyContext context, OutputCollector collector) {
 
-	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(myFields);
-	}
+        outputFile = Paths.get(stormConf.get("outputDir"), "output.txt");
 
-	@Override
-	public Fields getSchema() {
-		return myFields;
-	}
+        try {
+            BufferedWriter bufferedWriter = Files.newBufferedWriter(outputFile, Charset.defaultCharset());
+            writer = new PrintWriter(bufferedWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String getExecutorId() {
+        return executorId;
+    }
+
+    @Override
+    public void setRouter(StreamRouter router) {
+        // Do nothing
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(myFields);
+    }
+
+    @Override
+    public Fields getSchema() {
+        return myFields;
+    }
 
 }

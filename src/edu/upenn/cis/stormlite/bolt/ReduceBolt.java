@@ -100,7 +100,7 @@ public class ReduceBolt implements IRichBolt {
 
         int numberOfWorkers = stormConf.get("workerList").split(",").length;
         int mapExecutors = Integer.parseInt(stormConf.get("mapExecutors"));
-        neededVotesToComplete = numberOfWorkers + mapExecutors - 2;
+        neededVotesToComplete = numberOfWorkers + mapExecutors - 1;
 
     }
 

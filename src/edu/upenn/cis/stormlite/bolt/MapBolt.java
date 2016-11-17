@@ -93,7 +93,7 @@ public class MapBolt implements IRichBolt {
 
         int numberOfWorkers = stormConf.get("workerList").split(",").length;
         int spoutExecutors = Integer.parseInt(stormConf.get("spoutExecutors"));
-        neededVotesToComplete = numberOfWorkers + spoutExecutors - 2;
+        neededVotesToComplete = numberOfWorkers + spoutExecutors - 1;
     }
 
     /**
@@ -110,7 +110,6 @@ public class MapBolt implements IRichBolt {
 	        if (neededVotesToComplete == 0)
 	        	throw new RuntimeException("We received data after we thought the stream had ended!");
 	        
-	        // TODO:  call the mapper, and do bookkeeping to track work done
             mapJob.map(input.getStringByField("key"), input.getStringByField("value"), (Context) context);
 
     	} else if (input.isEndOfStream()) {

@@ -47,7 +47,7 @@ public class WorkerServer {
 
         this.state = new State(port);
 
-        setPort(port);  // TODO what kind of method is it
+        setPort(port);
         final ObjectMapper om = new ObjectMapper();
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         Spark.post(new Route("/definejob") {
@@ -207,8 +207,7 @@ public class WorkerServer {
                 }
 
                 try {
-                    // TODO make 15 secs
-                    Thread.sleep(3 * 1000);
+                    Thread.sleep(10 * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
