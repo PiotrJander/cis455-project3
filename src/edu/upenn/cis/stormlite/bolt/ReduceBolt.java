@@ -10,8 +10,6 @@ import edu.upenn.cis455.mapreduce.worker.ReduceBoltStore;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,7 +55,6 @@ public class ReduceBolt implements IRichBolt {
 	/**
 	 * Buffer for state, by key
 	 */
-	Map<String, List<String>> stateByKey = new HashMap<>();
 	int neededVotesToComplete = 0;
 	/**
      * This is where we send our output stream
@@ -97,9 +94,12 @@ public class ReduceBolt implements IRichBolt {
         // init db
         ReduceBoltStore.init(new File(System.getProperty("user.home") + "/store/" + executorId));
 
-        int numberOfWorkers = stormConf.get("workerList").split(",").length;
-        int mapExecutors = Integer.parseInt(stormConf.get("mapExecutors"));
-        neededVotesToComplete = numberOfWorkers + mapExecutors - 1;
+//        int numberOfWorkers = stormConf.get("workerList").split(",").length;
+//        int mapExecutors = Integer.parseInt(stormConf.get("mapExecutors"));
+//        neededVotesToComplete = numberOfWorkers + mapExecutors - 1;
+
+        // TODO don't hardcode
+        neededVotesToComplete = 1;
 
     }
 
@@ -117,10 +117,15 @@ public class ReduceBolt implements IRichBolt {
 
             neededVotesToComplete--;
 
+            log.info("ReduceBolt @" + executorId + " received EOS; still expecting " + neededVotesToComplete);
+
             if (neededVotesToComplete == 0) {
                 ReduceBoltStore.getAllEntries().forEachRemaining(entry -> {
+                    log.info("ReduceBolt should emit tuple for key " + entry.getKey());
                     reduceJob.reduce(entry.getKey(), entry.getValues().iterator(), collector);
                 });
+
+                log.info("ReduceBolt @" + executorId + "received all EOS and emits an EOS");
                 collector.emitEndOfStream();
             }
 
@@ -131,7 +136,7 @@ public class ReduceBolt implements IRichBolt {
             log.info(getExecutorId() + " received " + key + " / " + value);
 
             ReduceBoltStore.addEntry(key, value);
-            log.info("Adding item to " + key + " / " + stateByKey.get(key).size());
+            log.info("ReduceBolt @" + executorId + " Adding item to " + key);
         }
     }
 

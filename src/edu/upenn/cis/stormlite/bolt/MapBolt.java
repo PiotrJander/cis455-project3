@@ -90,9 +90,12 @@ public class MapBolt implements IRichBolt {
         	throw new RuntimeException("Mapper class doesn't know how many input spout executors");
         }
 
-        int numberOfWorkers = stormConf.get("workerList").split(",").length;
-        int spoutExecutors = Integer.parseInt(stormConf.get("spoutExecutors"));
-        neededVotesToComplete = numberOfWorkers + spoutExecutors - 1;
+//        int numberOfWorkers = stormConf.get("workerList").split(",").length;
+//        int spoutExecutors = Integer.parseInt(stormConf.get("spoutExecutors"));
+//        neededVotesToComplete = numberOfWorkers + spoutExecutors - 1;
+
+        // TODO don't hardcode
+        neededVotesToComplete = 1;
     }
 
     /**
@@ -109,11 +112,17 @@ public class MapBolt implements IRichBolt {
             if (neededVotesToComplete == 0)
 	        	throw new RuntimeException("We received data after we thought the stream had ended!");
 
+            log.info("MapBolt @" + executorId + " emits " + input.getStringByField("value") + ": 1");
+
             mapJob.map(input.getStringByField("key"), input.getStringByField("value"), collector);
 
     	} else if (input.isEndOfStream()) {
             neededVotesToComplete--;
+
+            log.info("MapBolt @" + executorId + " received EOS; still expecting " + neededVotesToComplete);
+
             if (neededVotesToComplete == 0) {
+                log.info("MapBolt @" + executorId + "received all EOS and emits an EOS");
                 collector.emitEndOfStream();
             }
         }

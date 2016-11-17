@@ -17,13 +17,14 @@
  */
 package edu.upenn.cis.stormlite.bolt;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.upenn.cis.stormlite.IOutputCollector;
 import edu.upenn.cis.stormlite.TopologyContext;
 import edu.upenn.cis.stormlite.routers.StreamRouter;
 import edu.upenn.cis455.mapreduce.Context;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simplified version of Storm output queues
@@ -32,6 +33,8 @@ import edu.upenn.cis455.mapreduce.Context;
  *
  */
 public class OutputCollector implements IOutputCollector, Context {
+    static Logger log = Logger.getLogger(OutputCollector.class);
+
 	StreamRouter router;
 	TopologyContext context;
 	
@@ -39,11 +42,6 @@ public class OutputCollector implements IOutputCollector, Context {
 		this.context = context;
 	}
 
-	@Override
-	public void setRouter(StreamRouter router) {
-		this.router = router;
-	}
-	
 	/**
 	 * Emits a tuple to the stream destination
 	 * @param tuple
@@ -52,16 +50,23 @@ public class OutputCollector implements IOutputCollector, Context {
 		router.execute(tuple, context);
 	}
 
-	public void emitEndOfStream() {
+    public void emitEndOfStream() {
 		router.executeEndOfStream(context);
 	}
 
 	public StreamRouter getRouter() {
 		return router;
-	}
+    }
+
+    @Override
+    public void setRouter(StreamRouter router) {
+        this.router = router;
+    }
 
 	@Override
 	public void write(String key, String value) {
+        log.info("OutputCollector write " + key + ": " + value);
+
 		List<Object> values = new ArrayList<>();
 		values.add(key);
 		values.add(value);
