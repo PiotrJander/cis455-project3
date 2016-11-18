@@ -110,9 +110,11 @@ public class ReduceBolt implements IRichBolt {
     @Override
     public synchronized void execute(Tuple input) {
     	if (sentEof) {
-	        if (!input.isEndOfStream())
-	        	throw new RuntimeException("We received data after we thought the stream had ended!");
-    		// Already done!
+            if (!input.isEndOfStream()) {
+                log.info("We received data after we thought the stream had ended!");
+                throw new RuntimeException("We received data after we thought the stream had ended!");
+            }
+            // Already done!
 		} else if (input.isEndOfStream()) {
 
             neededVotesToComplete--;

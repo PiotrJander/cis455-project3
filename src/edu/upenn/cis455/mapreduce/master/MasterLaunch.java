@@ -137,7 +137,6 @@ public class MasterLaunch {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 
-        // TODO possibly add worker index to config
         IntStream.range(0, activeWorkers.length).forEach(i -> {
             try {
                 job.getConfig().put("workerIndex", String.valueOf(i));

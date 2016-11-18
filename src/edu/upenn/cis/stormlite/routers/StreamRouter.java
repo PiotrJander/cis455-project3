@@ -130,7 +130,7 @@ public abstract class StreamRouter implements OutputFieldsDeclarer {
 	public synchronized void execute(List<Object> tuple, TopologyContext context) {
 			IRichBolt bolt = getBoltFor(tuple);
 
-        log.info("Task queued: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
+//        log.info("Task queued: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
 
         if (bolt != null)
 				context.addStreamTask(new BoltTask(bolt, new Tuple(schema, tuple)));
@@ -151,7 +151,7 @@ public abstract class StreamRouter implements OutputFieldsDeclarer {
 					throw new RuntimeException("Trying to route to a local bolt executor, but our router seems to only return remote ones");
 			}
 
-        log.info("Task queued from other worker: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
+//        log.info("Task queued from other worker: " + bolt.getClass().getName() + " (" + bolt.getExecutorId() + "): " + tuple.toString());
         if (bolt != null)
 				context.addStreamTask(new BoltTask(bolt, new Tuple(schema, tuple)));
 			else

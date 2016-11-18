@@ -73,6 +73,8 @@ public class MasterStatus {
         PrintWriter writer = response.getWriter();
         writer.println("<html><head><title>Status</title></head><body>");
 
+        writer.println("<p>Piotr Jander piotr@sas.upenn.edu</p>");
+
         printStatusTable(writer, workers);
         printStatusForm(writer);
 

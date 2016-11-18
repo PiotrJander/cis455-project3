@@ -20,7 +20,7 @@
     <mkdir dir="target/worker/WEB-INF/classes"/>
     <mkdir dir="classes"/>
 
-    <!-- TODO does this help? -->
+    <!-- TODO does this copy log4j.properties? -->
     <copy todir="target/master/WEB-INF/classes" overwrite="true">
       <fileset dir="${resources.dir}">
         <include name="**"/>
@@ -45,7 +45,7 @@
     </javac>
   </target>
 
-  <target name="compile-embedded-jetty">
+  <target name="compile-embedded-jetty" depends="init">
     <javac srcdir="src" destdir="classes" includes="**/EmbeddedJetty.java" deprecation="on"
            debug="true" includeantruntime="false" classpath="classes">
       <compilerarg value="-Xlint"/>

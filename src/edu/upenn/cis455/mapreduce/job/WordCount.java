@@ -14,12 +14,22 @@ public class WordCount implements Job {
         context.write(value, "1");
     }
 
+    @Override
     public void reduce(String key, Iterator<String> values, Context context) {
-
         Iterable<String> iterable = () -> values;
         Stream<String> stream = StreamSupport.stream(iterable.spliterator(), false);
         int sum = stream.mapToInt(Integer::parseInt).sum();
         context.write(key, String.valueOf(sum));
     }
+
+//    public void reduce(String key, Iterator<String> values, Context context) {
+//
+//        Iterable<String> iterable = () -> values;
+//        Stream<String> stream = StreamSupport.stream(iterable.spliterator(), false);
+//        int sum = stream.mapToInt(Integer::parseInt).sum();
+//        context.write(key, String.valueOf(sum));
+//    }
+
+
 
 }

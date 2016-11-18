@@ -53,6 +53,10 @@ public class PrintBolt implements IRichBolt {
 
         if (!input.isEndOfStream()) {
 
+            if (eosExpected <= 0) {
+                log.info("Error");
+            }
+
             String line = input.getStringByField("key") + "," + input.getStringByField("value");
             writer.println(line);
 
@@ -74,7 +78,7 @@ public class PrintBolt implements IRichBolt {
     public void prepare(Map<String, String> stormConf, TopologyContext context, OutputCollector collector) {
 
         // TODO don't hardcode
-        eosExpected = 2;
+        eosExpected = 1;
 
         outputFile = Paths.get(stormConf.get("outputDir"), "output.txt");
 

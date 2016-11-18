@@ -109,8 +109,10 @@ public class MapBolt implements IRichBolt {
 	        String value = input.getStringByField("value");
             log.info(getExecutorId() + " received " + key + " / " + value);
 
-            if (neededVotesToComplete == 0)
-	        	throw new RuntimeException("We received data after we thought the stream had ended!");
+            if (neededVotesToComplete == 0) {
+                log.info("We received data after we thought the stream had ended!");
+                throw new RuntimeException("We received data after we thought the stream had ended!");
+            }
 
             log.info("MapBolt @" + executorId + " emits " + input.getStringByField("value") + ": 1");
 
