@@ -1,4 +1,4 @@
-package test.edu.upenn.cis.stormlite.mapreduce;
+package edu.upenn.cis455.mapreduce;
 
 import edu.upenn.cis.stormlite.spout.FileSpout;
 

@@ -17,45 +17,40 @@
  */
 package edu.upenn.cis.stormlite;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import edu.upenn.cis.stormlite.bolt.BoltDeclarer;
 import edu.upenn.cis.stormlite.bolt.IRichBolt;
 import edu.upenn.cis.stormlite.distributed.StringIntPairKeyDeserializer;
 import edu.upenn.cis.stormlite.spout.IRichSpout;
 import edu.upenn.cis.stormlite.tuple.Fields;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Topology {
 
 	/**
-	 * Spouts are the inputs, and each has a stream ID and a parallelism
+     * Each stream also has a grouping type
+     */
+    public Map<String, BoltDeclarer> boltGrouping = new HashMap<>();
+    /**
+     * Spouts are the inputs, and each has a stream ID and a parallelism
 	 */
 	Map<String,StringIntPair> spouts = new HashMap<>();
-	
 	/**
 	 * Bolts are the operators, and each has a stream ID
 	 * disjoint from the spouts
 	 */
 	Map<String, StringIntPair> bolts = new HashMap<>();
-	
 	/**
 	 * Bolts have multiple inputs connected to spouts (or other bolts)
 	 */
 	@JsonDeserialize(keyUsing = StringIntPairKeyDeserializer.class)
 	Map<StringIntPair, String> boltConnectors = new HashMap<>();
-	
 	/**
 	 * Each Stream has a set of fields, i.e., a schema
 	 */
 	Map<String, Fields> streamSchemas = new HashMap<>();
-
-	/**
-	 * Each stream also has a grouping type
-	 */
-	Map<String, BoltDeclarer> boltGrouping = new HashMap<>();
 
 	public Map<String, StringIntPair> getSpouts() {
 		return spouts;

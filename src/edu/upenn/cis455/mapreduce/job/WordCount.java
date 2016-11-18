@@ -9,6 +9,7 @@ import java.util.stream.StreamSupport;
 
 public class WordCount implements Job {
 
+    @Override
     public void map(String key, String value, Context context) {
 
         context.write(value, "1");

@@ -9,8 +9,8 @@ import edu.upenn.cis.stormlite.bolt.ReduceBolt;
 import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.distributed.WorkerJob;
 import edu.upenn.cis.stormlite.tuple.Fields;
+import edu.upenn.cis455.mapreduce.WordFileSpout;
 import test.edu.upenn.cis.stormlite.PrintBolt;
-import test.edu.upenn.cis.stormlite.mapreduce.WordFileSpout;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

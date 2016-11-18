@@ -11,6 +11,7 @@ import edu.upenn.cis.stormlite.distributed.WorkerHelper;
 import edu.upenn.cis.stormlite.distributed.WorkerJob;
 import edu.upenn.cis.stormlite.spout.FileSpout;
 import edu.upenn.cis.stormlite.tuple.Fields;
+import edu.upenn.cis455.mapreduce.WordFileSpout;
 import edu.upenn.cis455.mapreduce.worker.WorkerServer;
 import org.apache.log4j.Logger;
 import test.edu.upenn.cis.stormlite.PrintBolt;

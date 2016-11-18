@@ -1,134 +1,148 @@
 <project name="HW3" default="all" basedir="./">
-  <property name="shared.root" location="${basedir}"/>
-  <property name="file.separator" location="/"/>
-  <property name="project.root" location="${basedir}"/>
-  <property name="build.dir" location="${project.root}"/>
-  <property name="build.target.dir" location="${project.root}${file.separator}target"/>
-  <property name="web-inf.dir" location="${build.target.dir}${file.separator}WEB-INF"/>
-  <property name="classes.dir"     location="${web-inf.dir}${file.separator}classes"/>
-  <property name="web-inf.lib.dir" location="${web-inf.dir}${file.separator}lib"/>
-  <property name="test-classes.dir" location="${build.target.dir}${file.separator}test${file.separator}classes"/>
-  <property name="test-lib.dir"     location="${build.target.dir}${file.separator}test${file.separator}lib"/>
-  <property name="src.main.dir"  location="${build.dir}${file.separator}src${file.separator}"/>
-  <property name="inputlib.dir"  location="${shared.root}${file.separator}lib"/>
-  <property name="src.test.dir"  location="${build.dir}${file.separator}src${file.separator}test"/>
-  <property name="resources.dir" location="${build.dir}${file.separator}resources"/>
-  <property name="conf.dir"      location="${build.dir}${file.separator}conf"/>
+    <property name="shared.root" location="${basedir}"/>
+    <property name="file.separator" location="/"/>
+    <property name="project.root" location="${basedir}"/>
+    <property name="build.dir" location="${project.root}"/>
+    <property name="build.target.dir" location="${project.root}${file.separator}target"/>
+    <property name="web-inf.dir" location="${build.target.dir}${file.separator}WEB-INF"/>
+    <property name="classes.dir" location="${web-inf.dir}${file.separator}classes"/>
+    <property name="web-inf.lib.dir" location="${web-inf.dir}${file.separator}lib"/>
+    <property name="test-classes.dir" location="${build.target.dir}${file.separator}test${file.separator}classes"/>
+    <property name="test-lib.dir" location="${build.target.dir}${file.separator}test${file.separator}lib"/>
+    <property name="src.main.dir" location="${build.dir}${file.separator}src${file.separator}"/>
+    <property name="inputlib.dir" location="${shared.root}${file.separator}lib"/>
+    <property name="src.test.dir" location="${build.dir}${file.separator}src${file.separator}test"/>
+    <property name="resources.dir" location="${build.dir}${file.separator}resources"/>
+    <property name="conf.dir" location="${build.dir}${file.separator}conf"/>
 
-  <target name="init">
-    <mkdir dir="target/master/WEB-INF/classes"/>
-    <mkdir dir="target/worker/WEB-INF/classes"/>
-    <mkdir dir="classes"/>
+    <target name="init">
+        <mkdir dir="target/master/WEB-INF/classes"/>
+        <mkdir dir="target/worker/WEB-INF/classes"/>
+        <mkdir dir="classes"/>
 
-    <!-- TODO does this copy log4j.properties? -->
-    <copy todir="target/master/WEB-INF/classes" overwrite="true">
-      <fileset dir="${resources.dir}">
-        <include name="**"/>
-      </fileset>
-    </copy>
-    <copy todir="target/worker/WEB-INF/classes" overwrite="true">
-      <fileset dir="${resources.dir}">
-        <include name="**"/>
-      </fileset>
-    </copy>
-    <copy todir="classes" overwrite="true">
-      <fileset dir="${resources.dir}">
-        <include name="**"/>
-      </fileset>
-    </copy>
-  </target>
-
-  <target name="compile-jobs" depends="init">
-    <javac srcdir="src" destdir="classes" includes="**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
-           debug="true" includeantruntime="false" classpath="classes">
-      <compilerarg value="-Xlint"/>
-    </javac>
-  </target>
-
-  <target name="compile-embedded-jetty" depends="init">
-    <javac srcdir="src" destdir="classes" includes="**/EmbeddedJetty.java" deprecation="on"
-           debug="true" includeantruntime="false" classpath="classes">
-      <compilerarg value="-Xlint"/>
-      <classpath>
-        <fileset dir="${inputlib.dir}">
-          <include name="*.jar"/>
-        </fileset>
-      </classpath>
-    </javac>
-  </target>
-
-  <!--<target name="compile-embedded-jetty" description="Compiles the embedded Jetty">-->
-  <!--<mkdir dir="${classes.dir}"/>-->
-  <!--<javac srcdir="src/edu/upenn/cis455/" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on"-->
-  <!--includeAntRuntime="no">-->
-  <!--<include name="EmbeddedJetty.java"/>-->
-  <!--<classpath>-->
-  <!--<fileset dir="${inputlib.dir}">-->
-  <!--<include name="*.jar"/>-->
-  <!--</fileset>-->
-  <!--</classpath>-->
-  <!--</javac>-->
-  <!--</target>-->
-
-  <target name="compile-master" depends="init">
-    <javac srcdir="src" destdir="target/master/WEB-INF/classes" includes="**/master/*.java" deprecation="on"
-           debug="true" includeantruntime="false">
-      <compilerarg value="-Xlint"/>
-        <classpath>
-            <fileset dir="${inputlib.dir}">
-                <include name="*.jar"/>
+        <copy todir="classes" overwrite="true">
+            <fileset dir="${resources.dir}">
+                <include name="**"/>
             </fileset>
-        </classpath>
-    </javac>
-  </target>
+        </copy>
+    </target>
 
-  <target name="compile-worker" depends="init">
-    <javac srcdir="src" destdir="target/worker/WEB-INF/classes" includes="**/worker/*.java" deprecation="on"
-           debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
-      <compilerarg value="-Xlint"/>
-    </javac>
-  </target>
+    <target name="compile-jobs" depends="init">
+        <javac srcdir="src" destdir="classes" includes="**/job/*.java,**/Job.java,**/Context.java,**/EmbeddedJetty.java"
+               deprecation="on"
+               debug="true" includeantruntime="false" classpath="classes">
+            <compilerarg value="-Xlint"/>
+            <classpath>
+                <fileset dir="${inputlib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
 
-  <target name="all" depends="war-master,war-worker,compile-jobs"/>
+    <!--<target name="compile-embedded-jetty" depends="init">-->
+    <!--<javac srcdir="src" destdir="classes" includes="" deprecation="on"-->
+    <!--debug="true" includeantruntime="false">-->
+    <!--<compilerarg value="-Xlint"/>-->
+    <!---->
+    <!--</javac>-->
+    <!--</target>-->
 
-  <target name="war-master" depends="compile-master">
-    <jar destfile="master.war">
-      <fileset dir="target/master/" includes="WEB-INF/classes/**/*.class"/>
-      <fileset dir="target/master/" includes="WEB-INF/lib/*.jar"/>
-      <fileset dir="target/master/" includes="WEB-INF/*.xml"/>
-    </jar>
-  </target>
+    <!--<target name="compile-embedded-jetty" description="Compiles the embedded Jetty">-->
+    <!--<mkdir dir="${classes.dir}"/>-->
+    <!--<javac srcdir="src/edu/upenn/cis455/" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on"-->
+    <!--includeAntRuntime="no">-->
+    <!--<include name="EmbeddedJetty.java"/>-->
+    <!--<classpath>-->
+    <!--<fileset dir="${inputlib.dir}">-->
+    <!--<include name="*.jar"/>-->
+    <!--</fileset>-->
+    <!--</classpath>-->
+    <!--</javac>-->
+    <!--</target>-->
 
-  <target name="war-worker" depends="compile-worker">
-    <jar destfile="worker.war">
-      <fileset dir="target/worker/" includes="WEB-INF/classes/**/*.class"/>
-      <fileset dir="target/worker/" includes="WEB-INF/lib/*.jar"/>
-      <fileset dir="target/worker/" includes="WEB-INF/*.xml"/>
-    </jar>
-  </target>
+    <target name="compile-master" depends="init">
+        <javac srcdir="src" destdir="target/master/WEB-INF/classes" includes="**/master/*.java" deprecation="on"
+               debug="true" includeantruntime="false">
+            <compilerarg value="-Xlint"/>
+            <classpath>
+                <fileset dir="${inputlib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
 
-  <target name="run-master" depends="war-master,compile-embedded-jetty" description="Runs embedded Jetty.">
-    <java failonerror="true" fork="true" classname="edu.upenn.cis455.EmbeddedJetty">
-      <!--<classpath>-->
-      <!--<pathelement location="${classes.dir}"/>-->
-      <!--<fileset dir="${inputlib.dir}">-->
-      <!--<include name="*.jar"/>-->
-      <!--</fileset>-->
-      <!--</classpath>-->
-    </java>
-  </target>
+    <target name="compile-worker" depends="init">
+        <javac srcdir="src" destdir="target/worker/WEB-INF/classes" includes="**/worker/*.java" deprecation="on"
+               debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
+            <compilerarg value="-Xlint"/>
+            <classpath>
+                <fileset dir="${inputlib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
 
-  <target name="pack" description="Create an archive for submission">
-    <zip destfile="submit-hw3.zip">
-      <zipfileset dir="." excludes="target/**,**/*.class,submit-hw3.zip,master.war,worker*.war"/>
-    </zip>
-  </target>
+    <target name="all" depends="war-master,war-worker,compile-jobs"/>
 
-  <target name="clean">
-    <delete dir="target/master/WEB-INF/classes"/>
-    <delete dir="target/worker/WEB-INF/classes"/>
-    <delete dir="classes"/>
-    <delete file="master.war"/>
-    <delete file="worker.war"/>
-  </target>
+    <target name="war-master" depends="compile-master">
+        <jar destfile="master.war">
+            <fileset dir="target/master/" includes="WEB-INF/classes/**/*.class"/>
+            <fileset dir="target/master/" includes="WEB-INF/lib/*.jar"/>
+            <fileset dir="target/master/" includes="WEB-INF/*.xml"/>
+        </jar>
+    </target>
+
+    <target name="war-worker" depends="compile-worker">
+        <jar destfile="worker.war">
+            <fileset dir="target/worker/" includes="WEB-INF/classes/**/*.class"/>
+            <fileset dir="target/worker/" includes="WEB-INF/lib/*.jar"/>
+            <fileset dir="target/worker/" includes="WEB-INF/*.xml"/>
+        </jar>
+    </target>
+
+    <target name="start-master-and-worker" depends="all">
+        <java failonerror="true" fork="true" classname="edu.upenn.cis455.mapreduce.EmbeddedJetty">
+            <classpath>
+                <pathelement location="classes"/>
+                <fileset dir="${inputlib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="start-worker" depends="all">
+        <java failonerror="true" fork="true" classname="edu.upenn.cis455.mapreduce.worker.WorkerServer">
+            <classpath>
+                <pathelement location="classes"/>
+                <fileset dir="${inputlib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="start" depends="all">
+        <parallel>
+            <antcall target="start-master-and-worker"></antcall>
+            <antcall target="start-worker"></antcall>
+        </parallel>
+    </target>
+
+    <target name="pack" description="Create an archive for submission">
+        <zip destfile="submit-hw3.zip">
+            <zipfileset dir="." excludes="target/**,**/*.class,submit-hw3.zip,master.war,worker*.war"/>
+        </zip>
+    </target>
+
+    <target name="clean">
+        <delete dir="target/master/WEB-INF/classes"/>
+        <delete dir="target/worker/WEB-INF/classes"/>
+        <delete dir="classes"/>
+        <delete file="master.war"/>
+        <delete file="worker.war"/>
+    </target>
 </project>
